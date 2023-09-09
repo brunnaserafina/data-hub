@@ -1,27 +1,34 @@
 <template>
-  <nav><router-link to="/">Home</router-link> |</nav>
-  <router-view />
+  <main>
+    <NavbarMenu />
+
+    <SidebarMenu />
+
+    <router-view></router-view>
+  </main>
 </template>
+
+<script lang="ts">
+import { defineComponent } from "vue";
+import SidebarMenu from "./components/SidebarMenu.vue";
+import NavbarMenu from "./components/NavbarMenu.vue";
+
+export default defineComponent({
+  name: "App",
+  components: { SidebarMenu, NavbarMenu },
+});
+</script>
 
 <style lang="scss">
 #app {
-  font-family: Avenir, Helvetica, Arial, sans-serif;
+  font-family: "Poppins", sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   text-align: center;
-  color: #2c3e50;
+  color: #2e2e2e;
 }
 
-nav {
-  padding: 30px;
-
-  a {
-    font-weight: bold;
-    color: #2c3e50;
-
-    &.router-link-exact-active {
-      color: #42b983;
-    }
-  }
+body {
+  background-color: #f1f1f1;
 }
 </style>
