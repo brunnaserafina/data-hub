@@ -74,6 +74,14 @@ export default defineComponent({
         return;
       }
 
+      let date = this.formData.date;
+
+      const dividDate = date.split("-");
+      if (dividDate.length === 3) {
+        const [ano, mes, dia] = dividDate;
+        this.formData.date = `${dia}/${mes}/${ano}`;
+      }
+
       const cpfIsValid = cpf.isValid(this.formData.cpf);
       if (cpfIsValid) {
         try {
