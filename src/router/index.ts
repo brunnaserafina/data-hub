@@ -21,7 +21,7 @@ const routes: Array<RouteRecordRaw> = [
     component: ClientListView,
   },
   {
-    path: "/editar-cadastro",
+    path: "/editar-cadastro/:clientId",
     name: "clientEdit",
     component: ClientEditView,
   },

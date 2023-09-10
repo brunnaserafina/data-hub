@@ -16,14 +16,24 @@ export async function getClientData() {
 }
 
 export async function getSearchClientData(search: string) {
-  const promise = (await api.get(`/pessoas`)).data;
+  const promise = (await api.get("/pessoas")).data;
 
   const filteredData = promise.filter(
     (person: IClient) =>
-      person.name.toLowerCase().includes(search.toLowerCase()) ||
+      person.nome.toLowerCase().includes(search.toLowerCase()) ||
       person.cpf.includes(search) ||
-      person.date.includes(search)
+      person.dataNascimento.includes(search)
   );
 
   return filteredData;
+}
+
+export async function deleteClientData(id: number) {
+  const promise = await api.delete(`/pessoas/${id}`);
+  return promise;
+}
+
+export async function editClientData(id: number, body: IClient) {
+  const promise = await api.put(`/pessoas/${id}`, body);
+  return promise;
 }

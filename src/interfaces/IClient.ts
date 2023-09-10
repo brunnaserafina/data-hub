@@ -1,6 +1,6 @@
 export default interface IClient {
   id?: number;
-  name: string;
-  date: string;
+  nome: string;
+  dataNascimento: string;
   cpf: string;
 }

@@ -11,14 +11,19 @@
             id="name"
             name="name"
             placeholder="Nome completo"
-            v-model="formData.name"
+            v-model="formData.nome"
             required
             autofocus
           />
         </div>
         <div class="colum-1">
           <label for="date">Data de nascimento</label>
-          <input type="date" id="date" name="date" v-model="formData.date" />
+          <input
+            type="date"
+            id="date"
+            name="date"
+            v-model="formData.dataNascimento"
+          />
         </div>
         <div>
           <label for="cpf">CPF*</label>
@@ -35,7 +40,13 @@
         </div>
         <div class="buttons colum-1">
           <button type="submit">Salvar</button>
-          <button class="delete-button" v-if="title === 'Editar Cadastro'">
+
+          <button
+            class="delete-button"
+            type="reset"
+            v-if="title === 'Editar Cadastro'"
+            @click="deleteClient"
+          >
             Excluir
           </button>
         </div>
@@ -45,38 +56,57 @@
 </template>
 
 <script lang="ts">
-import { defineComponent } from "vue";
+import { defineComponent, onMounted, ref } from "vue";
 import { vMaska } from "maska";
 import { cpf } from "cpf-cnpj-validator";
-import { postClientData } from "../services/api";
+import { deleteClientData, postClientData, editClientData } from "../services";
+import router from "@/router";
+import { useStore } from "vuex";
 
 export default defineComponent({
-  name: "ClientEditView",
+  name: "FormClientData",
   components: {},
   props: {
     title: {
       type: String,
       required: true,
     },
+    clientId: {
+      type: Number,
+      default: null,
+    },
   },
-  data() {
-    return {
-      formData: {
-        name: "",
-        date: "",
-        cpf: "",
-      },
+
+  setup(props) {
+    const store = useStore();
+    const formData = ref({
+      nome: "",
+      dataNascimento: "",
+      cpf: "",
+    });
+
+    const fetchDataFromVuex = () => {
+      const clientData = store.getters.getClientData;
+
+      if (clientData && props.title === "Editar Cadastro") {
+        formData.value.nome = clientData.nome;
+        formData.value.dataNascimento = clientData.dataNascimento;
+        formData.value.cpf = clientData.cpf;
+      }
     };
-  },
-  directives: { maska: vMaska },
-  methods: {
-    async handleSubmit(event: Event) {
+
+    onMounted(() => {
+      fetchDataFromVuex();
+    });
+
+    const handleSubmit = async (event: Event) => {
       event.preventDefault();
 
-      const nameIsCompleted = this.formData.name.length > 0;
+      const nameIsCompleted = formData.value.nome.length > 0;
       const nameIsValid =
-        this.formData.name ===
-        this.formData.name.replace(/[^a-zA-ZÀ-ÖØ-öø-ÿ\s]/g, ""); //regex to not allow numbers
+        formData.value.nome ===
+        formData.value.nome.replace(/[^a-zA-ZÀ-ÖØ-öø-ÿ\s]/g, "");
+
       if (!nameIsCompleted || !nameIsValid) {
         alert(
           "O campo nome é obrigatório e não permite números, insira o nome completo da pessoa a ser cadastrada e tente novamente."
@@ -84,30 +114,53 @@ export default defineComponent({
         return;
       }
 
-      let date = this.formData.date;
-
-      const dividDate = date.split("-");
-      if (dividDate.length === 3) {
-        const [ano, mes, dia] = dividDate;
-        this.formData.date = `${dia}/${mes}/${ano}`;
-      }
-
-      const cpfIsValid = cpf.isValid(this.formData.cpf);
+      const cpfIsValid = cpf.isValid(formData.value.cpf);
       if (cpfIsValid) {
         try {
-          await postClientData(this.formData);
-          alert("Pessoa cadastrada com sucesso!");
+          if (props.clientId) {
+            await editClientData(props.clientId, formData.value);
+            router.push("/gerenciar-cadastros");
+            alert("Pessoa atualizada com sucesso!");
+            return;
+          } else {
+            await postClientData(formData.value);
+            alert("Pessoa cadastrada com sucesso!");
+            formData.value.cpf = "";
+            formData.value.dataNascimento = "";
+            formData.value.nome = "";
+          }
         } catch (err) {
-          console.error(err);
           alert(
             "Houve algum erro durante o cadastro de usuário, tente novamente."
           );
         }
       } else {
-        alert("O cpf digitado é invalido, corrija e tente novamente.");
+        alert("O cpf digitado é inválido, corrija e tente novamente.");
       }
-    },
+    };
+
+    const deleteClient = async () => {
+      try {
+        if (
+          window.confirm("Tem certeza que deseja deletar a pessoa cadastrada?")
+        ) {
+          await deleteClientData(props.clientId);
+          router.push("/gerenciar-cadastros");
+          alert("Cliente deletado com sucesso!");
+          return;
+        }
+      } catch (err) {
+        console.error(err);
+      }
+    };
+
+    return {
+      formData,
+      handleSubmit,
+      deleteClient,
+    };
   },
+  directives: { maska: vMaska },
 });
 </script>
 

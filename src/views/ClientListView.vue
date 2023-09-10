@@ -16,7 +16,7 @@
 
       <table class="table">
         <thead>
-          <tr v-if="dataClient">
+          <tr>
             <th>ID</th>
             <th>Nome</th>
             <th class="center">Data de nascimento</th>
@@ -27,12 +27,12 @@
         <tbody>
           <tr v-for="client in dataClient" :key="client.id">
             <td>{{ client.id }}</td>
-            <td>{{ client.name }}</td>
-            <td>{{ client.date }}</td>
+            <td>{{ client.nome }}</td>
+            <td>{{ client.dataNascimento }}</td>
             <td>{{ client.cpf }}</td>
 
             <td>
-              <button @click="editRouter">
+              <button @click="editRouter(client)">
                 <i class="fa-regular fa-pen-to-square"></i>
               </button>
             </td>
@@ -45,9 +45,10 @@
 
 <script lang="ts">
 import { defineComponent, onMounted, ref, watch } from "vue";
-import { getClientData, getSearchClientData } from "../services/api";
+import { getClientData, getSearchClientData } from "../services";
 import router from "@/router";
 import IClient from "@/interfaces/IClient";
+import { useStore } from "vuex";
 
 export default defineComponent({
   name: "ClientListView",
@@ -55,6 +56,7 @@ export default defineComponent({
   setup() {
     const dataClient = ref<IClient[]>([]);
     const searchClient = ref<string>("");
+    const store = useStore();
 
     const fetchData = async () => {
       try {
@@ -74,8 +76,15 @@ export default defineComponent({
       }
     };
 
-    const editRouter = () => {
-      router.push("/editar-cadastro");
+    const editRouter = (client: IClient) => {
+      store.dispatch("saveClientData", {
+        id: client.id,
+        nome: client.nome,
+        dataNascimento: client.dataNascimento,
+        cpf: client.cpf,
+      });
+
+      router.push(`/editar-cadastro/${client.id}`);
     };
 
     watch(searchClient, () => {
