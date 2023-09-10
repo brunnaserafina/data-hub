@@ -20,11 +20,11 @@
           </tr>
         </thead>
         <tbody>
-          <tr>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
+          <tr v-for="client in dataClient" :key="client.id">
+            <td>{{ client.id }}</td>
+            <td>{{ client.name }}</td>
+            <td>{{ client.date }}</td>
+            <td>{{ client.cpf }}</td>
 
             <td>
               <button>
@@ -39,11 +39,29 @@
 </template>
 
 <script lang="ts">
-import { defineComponent } from "vue";
+import { defineComponent, onMounted, ref } from "vue";
+import { getClientData } from "../services/api";
+import IClient from "@/interfaces/IClient";
 
 export default defineComponent({
   name: "ClientListView",
   components: {},
+  setup() {
+    const dataClient = ref<IClient[]>([]);
+
+    const fetchData = async () => {
+      const response = await getClientData();
+      dataClient.value = response;
+    };
+
+    onMounted(() => {
+      fetchData();
+    });
+
+    return {
+      dataClient,
+    };
+  },
 });
 </script>
 
