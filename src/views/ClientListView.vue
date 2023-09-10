@@ -4,14 +4,19 @@
       <div class="title-search">
         <h1>Clientes cadastrados</h1>
         <div class="search">
-          <input type="search" placeholder="Procurar por..." />
+          <input
+            type="search"
+            v-model="searchClient"
+            @input="search"
+            placeholder="Procurar por..."
+          />
           <span>Pesquisar</span>
         </div>
       </div>
 
       <table class="table">
         <thead>
-          <tr>
+          <tr v-if="dataClient">
             <th>ID</th>
             <th>Nome</th>
             <th class="center">Data de nascimento</th>
@@ -39,8 +44,8 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, onMounted, ref } from "vue";
-import { getClientData } from "../services/api";
+import { defineComponent, onMounted, ref, watch } from "vue";
+import { getClientData, getSearchClientData } from "../services/api";
 import IClient from "@/interfaces/IClient";
 
 export default defineComponent({
@@ -48,18 +53,38 @@ export default defineComponent({
   components: {},
   setup() {
     const dataClient = ref<IClient[]>([]);
+    const searchClient = ref<string>("");
 
     const fetchData = async () => {
-      const response = await getClientData();
-      dataClient.value = response;
+      try {
+        const response = await getClientData();
+        dataClient.value = response;
+      } catch (err) {
+        console.error(err);
+      }
     };
 
-    onMounted(() => {
-      fetchData();
+    const search = async () => {
+      try {
+        const response = await getSearchClientData(searchClient.value);
+        dataClient.value = response;
+      } catch (err) {
+        console.error(err);
+      }
+    };
+
+    watch(searchClient, () => {
+      search();
+    });
+
+    onMounted(async () => {
+      await fetchData();
     });
 
     return {
       dataClient,
+      searchClient,
+      search,
     };
   },
 });

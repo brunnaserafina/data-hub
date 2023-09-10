@@ -6,16 +6,24 @@ const api = axios.create({
 });
 
 export async function postClientData(body: IClient) {
-  try {
-    const response = await api.post("/pessoas", body);
-    return response.data;
-  } catch (error) {
-    console.error(error);
-  }
+  const promise = await api.post("/pessoas", body);
+  return promise.data;
 }
 
 export async function getClientData() {
   const promise = await api.get("/pessoas");
-  console.log(promise);
   return promise.data;
+}
+
+export async function getSearchClientData(search: string) {
+  const promise = (await api.get(`/pessoas`)).data;
+
+  const filteredData = promise.filter(
+    (person: IClient) =>
+      person.name.toLowerCase().includes(search.toLowerCase()) ||
+      person.cpf.includes(search) ||
+      person.date.includes(search)
+  );
+
+  return filteredData;
 }

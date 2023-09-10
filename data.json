@@ -1,18 +1,5 @@
 {
-  "pessoas": [
-    {
-      "name": "Brunna",
-      "date": "2023-09-07",
-      "cpf": "097.455.799-47",
-      "id": 1
-    },
-    {
-      "name": "Jefinho",
-      "date": "2023-09-01",
-      "cpf": "434.582.390-06",
-      "id": 2
-    }
-  ],
+  "pessoas": [],
   "produtos": [],
   "pedidos": []
 }
