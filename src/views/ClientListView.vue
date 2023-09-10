@@ -32,7 +32,7 @@
             <td>{{ client.cpf }}</td>
 
             <td>
-              <button>
+              <button @click="editRouter">
                 <i class="fa-regular fa-pen-to-square"></i>
               </button>
             </td>
@@ -46,6 +46,7 @@
 <script lang="ts">
 import { defineComponent, onMounted, ref, watch } from "vue";
 import { getClientData, getSearchClientData } from "../services/api";
+import router from "@/router";
 import IClient from "@/interfaces/IClient";
 
 export default defineComponent({
@@ -73,6 +74,10 @@ export default defineComponent({
       }
     };
 
+    const editRouter = () => {
+      router.push("/editar-cadastro");
+    };
+
     watch(searchClient, () => {
       search();
     });
@@ -85,6 +90,7 @@ export default defineComponent({
       dataClient,
       searchClient,
       search,
+      editRouter,
     };
   },
 });

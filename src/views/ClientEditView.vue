@@ -3,15 +3,15 @@
 </template>
 
 <script lang="ts">
-import { defineComponent } from "vue";
 import FormClientData from "@/components/FormClientData.vue";
+import { defineComponent } from "vue";
 
 export default defineComponent({
-  name: "ClientRegistrationView",
+  name: "ClientEditView",
   components: { FormClientData },
   data() {
     return {
-      title: "Novo Cadastro",
+      title: "Editar Cadastro",
     };
   },
 });
