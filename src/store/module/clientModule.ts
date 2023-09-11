@@ -1,24 +1,27 @@
+import IClient from "@/interfaces/IClient";
+import { Commit } from "vuex";
+
 const state = {
   clientData: {
-    id: null,
+    id: undefined,
     nome: "",
     dataNascimento: "",
     cpf: "",
-  },
+  } as IClient,
 };
 
 const getters = {
-  getClientData: (state: any) => state.clientData,
+  getClientData: (state: { clientData: IClient }): IClient => state.clientData,
 };
 
 const mutations = {
-  setClientData(state: any, clientData: any) {
+  setClientData(state: { clientData: IClient }, clientData: IClient): void {
     state.clientData = clientData;
   },
 };
 
 const actions = {
-  saveClientData({ commit }: any, clientData: any) {
+  saveClientData({ commit }: { commit: Commit }, clientData: IClient): void {
     commit("setClientData", clientData);
   },
 };

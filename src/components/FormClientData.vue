@@ -4,19 +4,20 @@
       <h1>{{ title }}</h1>
 
       <form @submit.prevent="handleSubmit" class="form">
-        <div class="colum1-2">
+        <div class="column1-2">
           <label for="name">Nome completo*</label>
           <input
             type="text"
             id="name"
             name="name"
-            placeholder="Nome completo"
+            placeholder="Insira o nome completo do cliente"
             v-model="formData.nome"
             required
             autofocus
+            ref="nameInput"
           />
         </div>
-        <div class="colum-1">
+        <div class="column-1">
           <label for="date">Data de nascimento</label>
           <input
             type="date"
@@ -38,7 +39,7 @@
             required
           />
         </div>
-        <div class="buttons colum-1">
+        <div class="buttons column-1">
           <button type="submit">Salvar</button>
 
           <button
@@ -56,7 +57,7 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, onMounted, ref } from "vue";
+import { defineComponent, nextTick, onMounted, ref } from "vue";
 import { vMaska } from "maska";
 import { cpf } from "cpf-cnpj-validator";
 import { deleteClientData, postClientData, editClientData } from "../services";
@@ -78,14 +79,15 @@ export default defineComponent({
   },
 
   setup(props) {
-    const store = useStore();
+    const nameInput = ref<HTMLInputElement | null>(null);
     const formData = ref({
       nome: "",
       dataNascimento: "",
       cpf: "",
     });
+    const store = useStore();
 
-    const fetchDataFromVuex = () => {
+    const fetchSelectedClientFromVuex = () => {
       const clientData = store.getters.getClientData;
 
       if (clientData && props.title === "Editar Cadastro") {
@@ -96,7 +98,13 @@ export default defineComponent({
     };
 
     onMounted(() => {
-      fetchDataFromVuex();
+      fetchSelectedClientFromVuex();
+
+      nextTick(() => {
+        if (nameInput.value) {
+          nameInput.value.focus(); //autofocus on input even after rendering element
+        }
+      });
     });
 
     const handleSubmit = async (event: Event) => {
@@ -158,6 +166,7 @@ export default defineComponent({
       formData,
       handleSubmit,
       deleteClient,
+      nameInput,
     };
   },
   directives: { maska: vMaska },
@@ -165,107 +174,106 @@ export default defineComponent({
 </script>
 
 <style lang="scss">
+@import "../assets/styles/globalStyles.scss";
+
 .client-registration {
-  margin-left: 300px;
   display: flex;
   justify-content: center;
   align-items: center;
+  margin-left: $width-sidebar-desk;
   height: 70vh;
 
   > div {
-    background-color: white;
-    width: 700px;
+    background-color: $color-white;
     padding: 30px;
     justify-content: flex-start;
-    top: 0;
-    bottom: 0;
-  }
 
-  h1 {
-    text-transform: uppercase;
-    font-size: 22px;
-    text-align: start;
-    position: relative;
-    margin-bottom: 50px;
-  }
+    h1 {
+      text-transform: uppercase;
+      font-size: 22px;
+      text-align: start;
+      margin-bottom: 50px;
+      position: relative;
 
-  h1:after {
-    content: "";
-    height: 2px;
-    width: 100%;
-    display: block;
-    position: absolute;
-    background-color: #cccccc;
-    margin-top: 5px;
-  }
+      &:after {
+        content: "";
+        height: 2px;
+        width: 100%;
+        display: block;
+        position: absolute;
+        background-color: $color-gray-01;
+        margin-top: 5px;
+      }
+    }
 
-  form {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 20px;
-  }
+    form {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
 
-  .form input:focus {
-    outline: none;
-    border-color: #ffbb00;
-    background: #ffffff;
-    box-shadow: 0 0 0 2px #fea;
-  }
+      .column1-2,
+      .column-1 {
+        grid-column: 1;
 
-  .colum1-2 {
-    grid-column: 1/-1;
-  }
+        &.column1-2 {
+          grid-column: 1/-1;
+        }
+      }
 
-  .colum-1 {
-    grid-column: 1;
-  }
+      label {
+        display: block;
+        text-align: start;
+        margin-bottom: 10px;
+      }
 
-  label {
-    display: block;
-    text-align: start;
-    margin-bottom: 10px;
-  }
+      input {
+        margin-bottom: 20px;
+        width: 100%;
+        background-color: $color-gray-02;
+        border: 1px solid $color-gray-03;
+        height: 50px;
+        border-radius: 10px;
+        padding: 5px;
+        box-sizing: border-box;
 
-  input {
-    margin-bottom: 20px;
-    width: min-content;
-    background-color: #f7f7f7;
-    border: 1px solid #ededed;
-    height: 50px;
-    border-radius: 10px;
-    padding: 5px;
-    box-sizing: border-box;
-    width: 100%;
-  }
+        &:focus {
+          outline: none;
+          border-color: $color-yellow;
+          background: $color-white;
+          box-shadow: 0 0 0 2px $color-yellow-01;
+        }
+      }
+    }
 
-  button {
-    background-color: #ffb60d;
-    border: none;
-    width: 120px;
-    height: 60px;
-    border-radius: 10px;
-    text-transform: uppercase;
-    font-weight: 600;
-    align-self: flex-start;
-    cursor: pointer;
-  }
+    .buttons {
+      display: flex;
+      justify-content: flex-start;
+      gap: 30px;
 
-  button:hover {
-    background: linear-gradient(#ffb60d, #e59317);
-  }
+      button {
+        background-color: $color-yellow;
+        border: none;
+        width: 120px;
+        height: 60px;
+        border-radius: 10px;
+        text-transform: uppercase;
+        font-weight: 600;
+        align-self: flex-start;
+        cursor: pointer;
 
-  .buttons {
-    display: flex;
-    justify-content: flex-start;
-    gap: 30px;
-  }
+        &:hover {
+          background: linear-gradient($color-yellow, $color-yellow-02);
+        }
 
-  .delete-button {
-    background-color: red;
-  }
+        &.delete-button {
+          background-color: $color-red;
 
-  .delete-button:hover {
-    background: linear-gradient(#ff4949, #e51717);
+          &:hover {
+            background: linear-gradient($color-red, $color-red-02);
+          }
+        }
+      }
+    }
   }
 }
 </style>

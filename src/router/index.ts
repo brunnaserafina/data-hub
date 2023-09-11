@@ -1,5 +1,4 @@
 import { createRouter, createWebHashHistory, RouteRecordRaw } from "vue-router";
-import HomeView from "../views/HomeView.vue";
 import ClientRegistrationView from "../views/ClientRegistrationView.vue";
 import ClientListView from "../views/ClientListView.vue";
 import ClientEditView from "../views/ClientEditView.vue";
@@ -8,7 +7,7 @@ const routes: Array<RouteRecordRaw> = [
   {
     path: "/",
     name: "home",
-    component: HomeView,
+    redirect: "/cadastrar-cliente",
   },
   {
     path: "/cadastrar-cliente",

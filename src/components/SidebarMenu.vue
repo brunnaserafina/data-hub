@@ -2,15 +2,13 @@
   <aside>
     <div>
       <p>Clientes</p>
-      <!-- <span>
-        <i class="fa-solid fa-chevron-down"></i>
-      </span> -->
     </div>
 
     <router-link
       to="/cadastrar-cliente"
-      @click="updateActive('cadastro')"
-      :class="{ 'page-active': active === 'cadastro' }"
+      :class="{
+        'page-active': $route.path === '/cadastrar-cliente',
+      }"
     >
       <i class="fa-regular fa-square-plus"></i>
       <span>Adicionar cadastro</span>
@@ -18,62 +16,51 @@
 
     <router-link
       to="/gerenciar-cadastros"
-      @click="updateActive('list')"
-      :class="{ 'page-active': active === 'list' }"
+      :class="{
+        'page-active': $route.path === '/gerenciar-cadastros',
+      }"
     >
       <i class="fa-regular fa-rectangle-list"></i>
-      <span>Listar e gerenciar cadastros</span>
+      <span>Gerenciar cadastros</span>
     </router-link>
   </aside>
 </template>
 
 <script lang="ts">
-import { defineComponent, onMounted, ref } from "vue";
+import { defineComponent } from "vue";
 
 export default defineComponent({
   name: "SidebarMenu",
-  setup() {
-    const active = ref<string>("");
-
-    function updateActive(item: string) {
-      active.value = item;
-      localStorage.setItem("activeRoute", item);
-    }
-
-    onMounted(() => {
-      const savedActiveRoute = localStorage.getItem("activeRoute");
-      if (savedActiveRoute) {
-        active.value = savedActiveRoute;
-      }
-    });
-
-    return {
-      active,
-      updateActive,
-    };
-  },
 });
 </script>
 
 <style lang="scss">
+@import "../assets/styles/globalStyles.scss";
+
 aside {
   position: fixed;
   left: 0;
-  width: 300px;
+  width: $width-sidebar-desk;
   height: 100%;
-  background-color: #2c2c2c;
+  background-color: $color-black-02;
+
+  div,
+  a {
+    background-color: $color-black-02;
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+    padding: 5px;
+    color: $color-white;
+    text-decoration: none;
+    border-bottom: 1px solid $color-gray;
+    font-size: 15px;
+  }
 
   div {
-    background-color: #2c2c2c;
     height: 50px;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
     padding: 5px 30px;
-    box-sizing: border-box;
     font-weight: 600;
-    border-bottom: 1px solid #9c9c9c;
-    color: white;
 
     span {
       font-size: 16px;
@@ -81,36 +68,25 @@ aside {
   }
 
   a {
-    display: block;
-    color: inherit;
-    text-decoration: none;
-    background-color: #2c2c2c;
-    display: flex;
-    justify-content: flex-start;
-    align-items: center;
-    padding: 5px;
-    border-bottom: 1px solid #9c9c9c;
     height: 30px;
-    font-size: 15px;
-    color: white;
-
-    :nth-child(1) {
-      width: 20px;
-    }
 
     span {
       margin-left: 5px;
     }
 
-    &:hover {
-      background-color: #404040;
+    &:nth-child(1) {
+      width: 20px;
     }
-  }
 
-  .page-active {
-    font-weight: 500;
-    background-color: #ffb60d !important;
-    color: black !important;
+    &.page-active {
+      font-weight: 500;
+      background-color: $color-yellow !important;
+      color: $color-black-02 !important;
+    }
+
+    &:hover {
+      background-color: $color-black-hover;
+    }
   }
 }
 </style>

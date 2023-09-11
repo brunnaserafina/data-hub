@@ -20,15 +20,17 @@ export default defineComponent({
 </script>
 
 <style lang="scss">
+@import "./assets/styles/globalStyles.scss";
+
 #app {
   font-family: "Poppins", sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   text-align: center;
-  color: #2e2e2e;
+  color: $color-font;
 }
 
 body {
-  background-color: #f1f1f1;
+  background-color: $background;
 }
 </style>

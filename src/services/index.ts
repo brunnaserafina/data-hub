@@ -10,12 +10,12 @@ export async function postClientData(body: IClient) {
   return promise.data;
 }
 
-export async function getClientData() {
+export async function getClientData(): Promise<IClient[]> {
   const promise = await api.get("/pessoas");
   return promise.data;
 }
 
-export async function getSearchClientData(search: string) {
+export async function getSearchClientData(search: string): Promise<IClient[]> {
   const promise = (await api.get("/pessoas")).data;
 
   const filteredData = promise.filter(
