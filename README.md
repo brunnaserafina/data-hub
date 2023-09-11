@@ -109,6 +109,20 @@ O projeto consome uma API RESTful com json-server para fins de desenvolvimento. 
 <br />
 <br />
 
+### Testes
+A aplicação possui alguns testes unitários utilizando Jest e Vue Test Utils. Estão localizados na pasta "tests/unit" para rodar basta executar o comando abaixo na raíz do projeto.
+
+```bash
+ $ npm run test:unit
+```
+ou 
+
+```bash
+ $ npx jest
+```
+<br />
+<br />
+
 ### Utilização da aplicação
 Após iniciar a aplicação, você terá acesso às seguintes funcionalidades:
 
