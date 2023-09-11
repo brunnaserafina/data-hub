@@ -24,7 +24,7 @@
     "src/**/*.vue",
     "tests/**/*.ts",
     "tests/**/*.tsx",
-    "tests/unit/example.spec.js",
+    "tests/unit/views/ClientListView.spec.ts",
     "src/tests/unit/example.spec.js"
   ],
   "exclude": ["node_modules"]

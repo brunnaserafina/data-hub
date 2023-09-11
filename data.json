@@ -11,12 +11,6 @@
       "nome": "cliente 2",
       "cpf": "000.000.001-00",
       "dataNascimento": "1999-12-31"
-    },
-    {
-      "nome": "Brunna",
-      "dataNascimento": "2023-09-14",
-      "cpf": "593.851.220-45",
-      "id": 3
     }
   ],
   "produtos": [
