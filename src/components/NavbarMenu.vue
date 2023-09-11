@@ -1,6 +1,11 @@
 <template>
   <nav>
-    <img src="../assets/images/logo-escriba.png" alt="Logo Escriba" />
+    <img
+      width="68"
+      height="66"
+      src="../assets/images/logo-escriba.png"
+      alt="Logo Escriba"
+    />
     <p>Olá, seja bem vindo(a)!</p>
   </nav>
 </template>
@@ -17,6 +22,10 @@ export default defineComponent({
 @import "../assets/styles/globalStyles.scss";
 
 nav {
+  position: fixed;
+  top: 0;
+  z-index: 2;
+  width: 100%;
   background-color: $color-black-01;
   display: flex;
   justify-content: space-between;

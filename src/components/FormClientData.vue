@@ -15,9 +15,9 @@
             required
             autofocus
             ref="nameInput"
-            :class="{ 'invalid-name': errorInputName }"
+            :class="{ 'invalid-input': isNameInvalid && formSubmitted }"
           />
-          <small v-if="errorInputName"
+          <small v-if="isNameInvalid && formSubmitted"
             >Preencha o nome de forma correta, com pelo menos um caractere e sem
             números</small
           >
@@ -41,10 +41,12 @@
             v-maska
             data-maska="###.###.###-##"
             v-model="formData.cpf"
-            :class="{ 'invalid-name': errorInputCpf }"
+            :class="{ 'invalid-input': isCpfInvalid && formSubmitted }"
             required
           />
-          <small v-if="errorInputCpf">Preencha com um CPF válido</small>
+          <small v-if="isCpfInvalid && formSubmitted"
+            >Preencha com um CPF válido</small
+          >
         </div>
         <div class="buttons column-1">
           <button type="submit">Salvar</button>
@@ -64,13 +66,17 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, nextTick, onMounted, ref } from "vue";
+import { computed, defineComponent, nextTick, onMounted, ref } from "vue";
 import { vMaska } from "maska";
 import { cpf } from "cpf-cnpj-validator";
 import { deleteClientData, postClientData, editClientData } from "../services";
 import router from "@/router";
 import { useStore } from "vuex";
-import Swal from "sweetalert2";
+import {
+  showSuccessAlert,
+  showErrorAlert,
+  confirmActionAlert,
+} from "../utils/alertMessages";
 
 export default defineComponent({
   name: "FormClientData",
@@ -87,14 +93,13 @@ export default defineComponent({
   },
   setup(props) {
     const nameInput = ref<HTMLInputElement | null>(null);
+    const formSubmitted = ref<boolean>(false);
     const formData = ref({
       nome: "",
       dataNascimento: "",
       cpf: "",
     });
     const store = useStore();
-    const errorInputName = ref<boolean>(false);
-    const errorInputCpf = ref<boolean>(false);
 
     const fetchSelectedClientFromVuex = () => {
       const clientData = store.getters.getClientData;
@@ -116,112 +121,74 @@ export default defineComponent({
       });
     });
 
-    const isNameValid = () => {
+    const isNameValid = computed(() =>
+      /^[a-zA-ZÀ-ÖØ-öø-ÿ\s]+$/.test(formData.value.nome)
+    );
+    const isNameInvalid = computed(() => {
       const nameIsCompleted = formData.value.nome.length > 0;
-      const nameIsValid =
-        formData.value.nome ===
-        formData.value.nome.replace(/[^a-zA-ZÀ-ÖØ-öø-ÿ\s]/g, "");
+      return !(nameIsCompleted && isNameValid.value);
+    });
 
-      if (!nameIsCompleted || !nameIsValid) {
-        return false;
-      }
-
-      return true;
-    };
+    const isCpfValid = computed(() => cpf.isValid(formData.value.cpf));
+    const isCpfInvalid = computed(() => {
+      const cpfIsCompleted = formData.value.cpf.length > 0;
+      return !(cpfIsCompleted && isCpfValid.value);
+    });
 
     const handleSubmit = async (event: Event) => {
       event.preventDefault();
+      formSubmitted.value = true;
 
-      const cpfIsValid = cpf.isValid(formData.value.cpf);
-
-      if (!isNameValid() || !cpfIsValid) {
-        if (!isNameValid()) {
-          errorInputName.value = true;
-        } else {
-          errorInputName.value = false;
-        }
-
-        if (!cpfIsValid) {
-          errorInputCpf.value = true;
-        } else {
-          errorInputCpf.value = false;
-        }
-
+      if (isNameInvalid.value || isCpfInvalid.value) {
         return;
       }
 
-      errorInputName.value = false;
-      errorInputCpf.value = false;
       try {
         if (props.clientId) {
           await editClientData(props.clientId, formData.value);
+          showSuccessAlert("Pessoa atualizada com sucesso!");
           router.push("/gerenciar-cadastros");
-          Swal.fire({
-            position: "bottom-end",
-            icon: "success",
-            title: "Pessoa atualizada com sucesso!",
-            showConfirmButton: false,
-            timer: 1200,
-          });
-          return;
         } else {
           await postClientData(formData.value);
-          Swal.fire({
-            position: "bottom-end",
-            icon: "success",
-            title: "Pessoa cadastrada com sucesso!",
-            showConfirmButton: false,
-            timer: 1200,
-          });
-          formData.value.cpf = "";
-          formData.value.dataNascimento = "";
-          formData.value.nome = "";
+          showSuccessAlert("Pessoa cadastrada com sucesso!");
         }
+        formSubmitted.value = false;
+        resetFormData();
       } catch (err) {
-        Swal.fire({
-          position: "bottom-end",
-          icon: "error",
-          title: "Houve algum erro ao cadastrar o usuário, tente novamente!",
-          showConfirmButton: false,
-          timer: 1500,
-        });
+        showErrorAlert(
+          "Houve algum erro ao cadastrar o usuário, tente novamente!"
+        );
       }
     };
 
-    const deleteClient = async () => {
-      Swal.fire({
-        title: "",
-        text: "Tem certeza que deseja deletar a pessoa cadastrada?",
-        icon: "warning",
-        showCancelButton: true,
-        confirmButtonText: "Sim",
-        cancelButtonText: "Cancelar",
-        reverseButtons: true,
-      }).then(async (result) => {
+    const deleteClient = () => {
+      confirmActionAlert(
+        "Tem certeza que deseja deletar a pessoa cadastrada?"
+      ).then(async (result) => {
         if (result.isConfirmed) {
           await deleteClientData(props.clientId);
           router.push("/gerenciar-cadastros");
-          Swal.fire({
-            position: "bottom-end",
-            icon: "success",
-            title: "Cadastro deletado com sucesso!",
-            showConfirmButton: false,
-            timer: 1500,
-          });
-          return;
+          showSuccessAlert("Cadastro deletado com sucesso!");
         } else {
           router.push("/gerenciar-cadastros");
         }
       });
     };
 
+    const resetFormData = () => {
+      formData.value.cpf = "";
+      formData.value.dataNascimento = "";
+      formData.value.nome = "";
+    };
+
     return {
       formData,
+      nameInput,
+      isCpfInvalid,
+      isNameInvalid,
+      formSubmitted,
       handleSubmit,
       deleteClient,
-      nameInput,
-      errorInputName,
-      errorInputCpf,
     };
   },
   directives: { maska: vMaska },
@@ -299,7 +266,7 @@ export default defineComponent({
         }
       }
 
-      .invalid-name {
+      .invalid-input {
         border-color: $color-red !important;
         background-color: rgb(254, 203, 203) !important;
       }

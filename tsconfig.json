@@ -23,7 +23,9 @@
     "src/**/*.tsx",
     "src/**/*.vue",
     "tests/**/*.ts",
-    "tests/**/*.tsx"
+    "tests/**/*.tsx",
+    "tests/unit/example.spec.js",
+    "src/tests/unit/example.spec.js"
   ],
   "exclude": ["node_modules"]
 }

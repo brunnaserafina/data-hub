@@ -33,7 +33,7 @@
             <td>{{ client.cpf }}</td>
 
             <td>
-              <button @click="editRouter(client)">
+              <button aria-label="Editar" @click="editRouter(client)">
                 <i class="fa-regular fa-pen-to-square"></i>
               </button>
             </td>
@@ -105,9 +105,9 @@ export default defineComponent({
     return {
       dataClient,
       searchClient,
+      searchInput,
       search,
       editRouter,
-      searchInput,
     };
   },
 });
@@ -168,7 +168,7 @@ export default defineComponent({
           align-items: center;
           justify-content: center;
           height: 35px;
-          background-color: $color-gray;
+          background-color: $color-black-hover;
           border-radius: 0 5px 5px 0;
           color: $color-white;
         }
@@ -242,59 +242,33 @@ export default defineComponent({
   }
 
   @media (max-width: 1000px) {
-    padding: 0;
-    margin-left: 190px;
     width: 100%;
-
-    > div {
-      width: 100%;
-      padding: 10px !important;
-    }
-
-    > div .table {
-      width: 85%;
-    }
-
-    .title-search {
-      flex-direction: column;
-    }
-
-    input {
-      width: 100%;
-    }
-  }
-
-  @media (max-width: 1000px) {
     margin-left: 0;
     padding: 0;
     box-sizing: border-box !important;
 
     > div {
+      width: 100%;
       padding: 10px !important;
       display: flex;
       flex-direction: column;
       align-items: center;
       margin-top: 30px;
-    }
 
-    > div .table td {
-      padding: 0 !important;
-      box-sizing: border-box !important;
-    }
+      .table {
+        font-size: 12px;
+        width: 90%;
+      }
 
-    > div .table {
-      font-size: 12px;
-      width: 90%;
-    }
+      .table td {
+        padding: 0 !important;
+        box-sizing: border-box !important;
+      }
 
-    button {
-      width: 30px !important;
-      height: 30px !important;
-    }
-
-    .search {
-      margin-bottom: 20px;
-      width: 100% !important;
+      button {
+        width: 30px !important;
+        height: 30px !important;
+      }
     }
 
     .title-search {
@@ -303,6 +277,15 @@ export default defineComponent({
       flex-direction: column;
       align-items: center;
       width: 90%;
+
+      .search {
+        margin-bottom: 20px;
+        width: 100% !important;
+      }
+
+      input {
+        width: 100%;
+      }
     }
   }
 
