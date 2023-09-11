@@ -16,3 +16,26 @@ $color-red: rgb(235, 69, 69);
 $color-red-02: #e51717;
 
 $width-sidebar-desk: 300px;
+$font-poppins: "Poppins", sans-serif;
+
+/*sweet-alert styles*/
+.swal2-title {
+  font-family: $font-poppins;
+  font-size: 20px; /* Substitua pela cor desejada */
+}
+
+button:where(.swal2-styled).swal2-confirm {
+  font-family: $font-poppins;
+  background-color: $color-yellow !important; /* Substitua pela cor desejada */
+  color: $color-black-01 !important; /* Substitua pela cor desejada */
+}
+
+button:where(.swal2-styled).swal2-cancel {
+  font-family: $font-poppins;
+  background-color: $color-gray !important;
+  border: none !important;
+}
+
+.swal2-html-container {
+  font-family: $font-poppins;
+}

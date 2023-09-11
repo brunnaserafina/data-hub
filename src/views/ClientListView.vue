@@ -43,7 +43,6 @@
     </div>
   </section>
 </template>
-
 <script lang="ts">
 import { defineComponent, nextTick, onMounted, ref, watch } from "vue";
 import { getClientData, getSearchClientData } from "../services";
@@ -118,16 +117,18 @@ export default defineComponent({
 @import "../assets/styles/globalStyles.scss";
 
 #client-list {
-  margin-left: 300px;
+  margin-left: $width-sidebar-desk;
   padding: 3%;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
+  box-sizing: border-box;
 
   > div {
     background-color: $color-white;
     width: 70%;
+    min-width: max-content;
     min-height: 70vh;
     padding: 40px;
     box-sizing: border-box;
@@ -158,6 +159,7 @@ export default defineComponent({
 
       .search {
         display: flex;
+        justify-content: flex-end;
 
         span {
           display: flex;
@@ -177,6 +179,7 @@ export default defineComponent({
           padding: 5px !important;
           border: 2px solid $color-yellow;
           border-right: none;
+          width: 50%;
 
           &::placeholder {
             font-size: 14px;
@@ -234,6 +237,79 @@ export default defineComponent({
             background: linear-gradient($color-yellow, $color-yellow-02);
           }
         }
+      }
+    }
+  }
+
+  @media (max-width: 1000px) {
+    padding: 0;
+    margin-left: 190px;
+    width: 100%;
+
+    > div {
+      width: 100%;
+      padding: 10px !important;
+    }
+
+    > div .table {
+      width: 85%;
+    }
+
+    .title-search {
+      flex-direction: column;
+    }
+
+    input {
+      width: 100%;
+    }
+  }
+
+  @media (max-width: 1000px) {
+    margin-left: 0;
+    padding: 0;
+    box-sizing: border-box !important;
+
+    > div {
+      padding: 10px !important;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      margin-top: 30px;
+    }
+
+    > div .table td {
+      padding: 0 !important;
+      box-sizing: border-box !important;
+    }
+
+    > div .table {
+      font-size: 12px;
+      width: 90%;
+    }
+
+    button {
+      width: 30px !important;
+      height: 30px !important;
+    }
+
+    .search {
+      margin-bottom: 20px;
+      width: 100% !important;
+    }
+
+    .title-search {
+      font-size: 14px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      width: 90%;
+    }
+  }
+
+  @media (max-width: 600px) {
+    .search {
+      input {
+        width: 100% !important;
       }
     }
   }

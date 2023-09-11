@@ -88,5 +88,44 @@ aside {
       background-color: $color-black-hover;
     }
   }
+
+  @media (max-width: 1000px) {
+    width: max-content;
+  }
+
+  @media (max-width: 1000px) {
+    position: fixed;
+    bottom: 0 !important;
+    width: 100%;
+    height: max-content;
+    display: flex;
+    font-size: 14px;
+
+    div,
+    a {
+      height: 50px;
+      border-bottom: none;
+      border-right: 1px solid $color-gray;
+    }
+  }
+
+  @media (max-width: 500px) {
+    a {
+      font-size: 30px;
+      width: 50px;
+      display: block;
+    }
+
+    span {
+      display: none;
+    }
+
+    div {
+      width: 30%;
+    }
+    a {
+      width: 35% !important;
+    }
+  }
 }
 </style>

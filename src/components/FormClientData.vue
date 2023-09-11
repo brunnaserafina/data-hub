@@ -15,7 +15,12 @@
             required
             autofocus
             ref="nameInput"
+            :class="{ 'invalid-name': errorInputName }"
           />
+          <small v-if="errorInputName"
+            >Preencha o nome de forma correta, com pelo menos um caractere e sem
+            números</small
+          >
         </div>
         <div class="column-1">
           <label for="date">Data de nascimento</label>
@@ -36,8 +41,10 @@
             v-maska
             data-maska="###.###.###-##"
             v-model="formData.cpf"
+            :class="{ 'invalid-name': errorInputCpf }"
             required
           />
+          <small v-if="errorInputCpf">Preencha com um CPF válido</small>
         </div>
         <div class="buttons column-1">
           <button type="submit">Salvar</button>
@@ -63,6 +70,7 @@ import { cpf } from "cpf-cnpj-validator";
 import { deleteClientData, postClientData, editClientData } from "../services";
 import router from "@/router";
 import { useStore } from "vuex";
+import Swal from "sweetalert2";
 
 export default defineComponent({
   name: "FormClientData",
@@ -77,7 +85,6 @@ export default defineComponent({
       default: null,
     },
   },
-
   setup(props) {
     const nameInput = ref<HTMLInputElement | null>(null);
     const formData = ref({
@@ -86,6 +93,8 @@ export default defineComponent({
       cpf: "",
     });
     const store = useStore();
+    const errorInputName = ref<boolean>(false);
+    const errorInputCpf = ref<boolean>(false);
 
     const fetchSelectedClientFromVuex = () => {
       const clientData = store.getters.getClientData;
@@ -107,59 +116,103 @@ export default defineComponent({
       });
     });
 
-    const handleSubmit = async (event: Event) => {
-      event.preventDefault();
-
+    const isNameValid = () => {
       const nameIsCompleted = formData.value.nome.length > 0;
       const nameIsValid =
         formData.value.nome ===
         formData.value.nome.replace(/[^a-zA-ZÀ-ÖØ-öø-ÿ\s]/g, "");
 
       if (!nameIsCompleted || !nameIsValid) {
-        alert(
-          "O campo nome é obrigatório e não permite números, insira o nome completo da pessoa a ser cadastrada e tente novamente."
-        );
+        return false;
+      }
+
+      return true;
+    };
+
+    const handleSubmit = async (event: Event) => {
+      event.preventDefault();
+
+      const cpfIsValid = cpf.isValid(formData.value.cpf);
+
+      if (!isNameValid() || !cpfIsValid) {
+        if (!isNameValid()) {
+          errorInputName.value = true;
+        } else {
+          errorInputName.value = false;
+        }
+
+        if (!cpfIsValid) {
+          errorInputCpf.value = true;
+        } else {
+          errorInputCpf.value = false;
+        }
+
         return;
       }
 
-      const cpfIsValid = cpf.isValid(formData.value.cpf);
-      if (cpfIsValid) {
-        try {
-          if (props.clientId) {
-            await editClientData(props.clientId, formData.value);
-            router.push("/gerenciar-cadastros");
-            alert("Pessoa atualizada com sucesso!");
-            return;
-          } else {
-            await postClientData(formData.value);
-            alert("Pessoa cadastrada com sucesso!");
-            formData.value.cpf = "";
-            formData.value.dataNascimento = "";
-            formData.value.nome = "";
-          }
-        } catch (err) {
-          alert(
-            "Houve algum erro durante o cadastro de usuário, tente novamente."
-          );
+      errorInputName.value = false;
+      errorInputCpf.value = false;
+      try {
+        if (props.clientId) {
+          await editClientData(props.clientId, formData.value);
+          router.push("/gerenciar-cadastros");
+          Swal.fire({
+            position: "bottom-end",
+            icon: "success",
+            title: "Pessoa atualizada com sucesso!",
+            showConfirmButton: false,
+            timer: 1200,
+          });
+          return;
+        } else {
+          await postClientData(formData.value);
+          Swal.fire({
+            position: "bottom-end",
+            icon: "success",
+            title: "Pessoa cadastrada com sucesso!",
+            showConfirmButton: false,
+            timer: 1200,
+          });
+          formData.value.cpf = "";
+          formData.value.dataNascimento = "";
+          formData.value.nome = "";
         }
-      } else {
-        alert("O cpf digitado é inválido, corrija e tente novamente.");
+      } catch (err) {
+        Swal.fire({
+          position: "bottom-end",
+          icon: "error",
+          title: "Houve algum erro ao cadastrar o usuário, tente novamente!",
+          showConfirmButton: false,
+          timer: 1500,
+        });
       }
     };
 
     const deleteClient = async () => {
-      try {
-        if (
-          window.confirm("Tem certeza que deseja deletar a pessoa cadastrada?")
-        ) {
+      Swal.fire({
+        title: "",
+        text: "Tem certeza que deseja deletar a pessoa cadastrada?",
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonText: "Sim",
+        cancelButtonText: "Cancelar",
+        reverseButtons: true,
+      }).then(async (result) => {
+        if (result.isConfirmed) {
           await deleteClientData(props.clientId);
           router.push("/gerenciar-cadastros");
-          alert("Cliente deletado com sucesso!");
+          Swal.fire({
+            position: "bottom-end",
+            icon: "success",
+            title: "Cadastro deletado com sucesso!",
+            showConfirmButton: false,
+            timer: 1500,
+          });
           return;
+        } else {
+          router.push("/gerenciar-cadastros");
         }
-      } catch (err) {
-        console.error(err);
-      }
+      });
     };
 
     return {
@@ -167,6 +220,8 @@ export default defineComponent({
       handleSubmit,
       deleteClient,
       nameInput,
+      errorInputName,
+      errorInputCpf,
     };
   },
   directives: { maska: vMaska },
@@ -227,7 +282,7 @@ export default defineComponent({
       }
 
       input {
-        margin-bottom: 20px;
+        margin-bottom: 5px;
         width: 100%;
         background-color: $color-gray-02;
         border: 1px solid $color-gray-03;
@@ -242,6 +297,18 @@ export default defineComponent({
           background: $color-white;
           box-shadow: 0 0 0 2px $color-yellow-01;
         }
+      }
+
+      .invalid-name {
+        border-color: $color-red !important;
+        background-color: rgb(254, 203, 203) !important;
+      }
+
+      small {
+        color: $color-red;
+        display: block;
+        text-align: start;
+        width: 100%;
       }
     }
 
@@ -273,6 +340,21 @@ export default defineComponent({
           }
         }
       }
+    }
+  }
+
+  @media (max-width: 600px) {
+    form {
+      grid-template-columns: 1fr !important;
+    }
+  }
+
+  @media (max-width: 1000px) {
+    margin-left: 0;
+
+    > div {
+      margin-top: 100px;
+      min-height: 100%;
     }
   }
 }

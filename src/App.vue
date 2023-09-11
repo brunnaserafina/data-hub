@@ -32,5 +32,9 @@ export default defineComponent({
 
 body {
   background-color: $background;
+
+  @media (max-width: 1000px) {
+    background-color: $color-white;
+  }
 }
 </style>

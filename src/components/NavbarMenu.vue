@@ -1,7 +1,7 @@
 <template>
   <nav>
     <img src="../assets/images/logo-escriba.png" alt="Logo Escriba" />
-    <p>Olá, seja bem vindo!</p>
+    <p>Olá, seja bem vindo(a)!</p>
   </nav>
 </template>
 
